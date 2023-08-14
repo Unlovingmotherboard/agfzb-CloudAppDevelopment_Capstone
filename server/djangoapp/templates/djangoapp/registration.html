@@ -6,6 +6,45 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
     <body>
-    <!--Add a registration form here -->
+    <div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <a href="{% url 'djangoapp:index' %}" class="btn btn-secondary mb-3">Back to Home</a>
+            <div class="card">
+                <div class="card-header">
+                    {% if register_message_error %}
+                    <div class="alert alert-warning">
+                        {{ register_message_error }}
+                    </div>
+                    {% else %}
+                    Get Your Next Ride In No Time
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="username" name="username" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="firstName" class="form-label">First Name</label>
+                            <input type="text" class="form-control" id="firstName" name="firstName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="lastName" class="form-label">Last Name</label>
+                            <input type="text" class="form-control" id="lastName" name="lastName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Register</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
     </body>
 </html>
