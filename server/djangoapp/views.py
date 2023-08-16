@@ -3,7 +3,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, render, redirect
 # from .models import related models
-# from .restapis import related methods
+from .restapis import get_dealers_from_cf, get_dealer_reviews_from_cf
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 from datetime import datetime
@@ -12,9 +12,6 @@ import json
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
-
-
-# Create your views here.
 
 def about(request):
     if request.method == "GET":
@@ -72,17 +69,35 @@ def registration_request(request):
             print("Hi in else")
             return render(request, 'djangoapp/registration.html', context)
 
-    
 # Update the `get_dealerships` view to render the index page with a list of dealerships
 def get_dealerships(request):
     context = {}
     if request.method == "GET":
+        url = "https://us-south.functions.appdomain.cloud/api/v1/web/80ce1635-5b07-4c07-b501-faf8beb04e6c/dealership-package/get-dealership.json"
+        # Get dealers from the URL
+        dealerships = get_dealers_from_cf(url)
+        print(f"Back in views: {dealerships}")
+        # Concat all dealer's short name
+        dealer_names = ' '.join([dealer.short_name for dealer in dealerships])
+        # Return a list of dealer short name
+        context['dealers'] = dealer_names
         return render(request, 'djangoapp/index.html', context)
 
 
 # Create a `get_dealer_details` view to render the reviews of a dealer
-# def get_dealer_details(request, dealer_id):
-# ...
+def get_dealer_details(request, dealer_id):
+    context = {}
+    #if request.method == "POST":
+    url = "https://us-south.functions.appdomain.cloud/api/v1/web/80ce1635-5b07-4c07-b501-faf8beb04e6c/dealership-package/get-dealership-reviews.json"
+
+    reviews = get_dealer_reviews_from_cf(url, dealer_id)
+
+    context['reviews'] = reviews
+
+    return render(request, 'djangoapp/index.html', context)
+
+
+
 
 # Create a `add_review` view to submit a review
 # def add_review(request, dealer_id):
