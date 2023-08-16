@@ -60,8 +60,7 @@ def registration_request(request):
         except: 
             logger.error("New user")
         if not user_exist:
-            user = User.objects.create_user(username=username, first_name=first_name, last_name=last_name,
-                                            password=password)
+            user = User.objects.create_user(username=username, first_name=first_name, last_name=last_name, password=password)
             login(request, user)
             return redirect('djangoapp:index')
         else: 
@@ -100,6 +99,5 @@ def get_dealer_details(request, dealer_id):
 
 
 # Create a `add_review` view to submit a review
-# def add_review(request, dealer_id):
-# ...
-
+def add_review(request, dealer_id):
+    
