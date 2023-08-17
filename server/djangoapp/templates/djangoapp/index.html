@@ -59,6 +59,23 @@
     </nav>
     <!--Add a dealer table here -->
         Home Page
+        <a> 
+            <br>Do a little icon. Where it will load in a sprite for a successful response and request back.<br>
+
+            <br>Successful requests will simply display a green sprite and then load in the content.<br> 
+
+        </a>
+        {% if response_code == 'Success' %}
+            <div class="alert alert-success" role="alert">
+                <i class="bi bi-check-circle"></i> Request Successful!
+            </div>
+        {% elif response_code == 'Fail' %}
+            <div class="alert alert-danger" role="alert">
+                <i class="bi bi-exclamation-triangle"></i> Request Failed!
+            </div>
+        {% else %} 
+            
+        {% endif %}
     </body>
 
 </html>
