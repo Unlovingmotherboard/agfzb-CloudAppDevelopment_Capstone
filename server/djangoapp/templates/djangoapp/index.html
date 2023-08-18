@@ -53,9 +53,6 @@
                 {% endif %}
             </ul>
         </div>
-
-
-
     </nav>
     <!--Add a dealer table here -->
         Home Page
@@ -65,17 +62,49 @@
             <br>Successful requests will simply display a green sprite and then load in the content.<br> 
 
         </a>
-        {% if response_code == 'Success' %}
-            <div class="alert alert-success" role="alert">
-                <i class="bi bi-check-circle"></i> Request Successful!
-            </div>
-        {% elif response_code == 'Fail' %}
-            <div class="alert alert-danger" role="alert">
-                <i class="bi bi-exclamation-triangle"></i> Request Failed!
-            </div>
-        {% else %} 
-            
-        {% endif %}
+        <div class="request_response">
+            {% if response_code == 'Success' %}
+                <div class="alert alert-success" role="alert">
+                    <i class="bi bi-check-circle"></i> Request Successful!
+                </div>
+                {% elif response_code == 'Fail' %}
+                    <div class="alert alert-danger" role="alert">
+                    <i class="bi bi-exclamation-triangle"></i> Request Failed!
+                </div>
+        {% else %} {% endif %}
+        </div>
+
+        <div class="dealer_table">
+            <table class="table" id="table" data-filter-control="true">
+                <thead>
+                    <tr>
+                        <th data-field="id">ID</th>
+                        <th data-field="Dealer Name">Dealer Name</th>
+                        <th data-field="City">City</th>
+                        <th data-field="Address">Address</th>
+                        <th data-field="Zip Code">Zip Code</th>
+                        <th data-field="State" data-filter-control="select">State</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for dealer in dealers %}
+                        <tr>
+                            <td>{{dealer.id}}</td>
+                            <td><a href="{% url 'djangoapp:dealer_details' dealer.id %}">{{dealer.full_name}}</a></td>
+                            <td>{{dealer.city}}</td>
+                            <td>{{dealer.address}}</td>
+                            <td>{{dealer.zip}}</td>
+                            <td >{{dealer.st}}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </body>
 
+    <script>
+        $(function() {
+          $('#table').bootstrapTable()
+        })
+      </script>
 </html>

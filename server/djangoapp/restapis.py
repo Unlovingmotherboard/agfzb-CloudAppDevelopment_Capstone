@@ -84,6 +84,7 @@ def get_dealer_reviews_from_cf(url, dealer_id):
                 id=reviews["id"],
             )
             results.append(dealer_obj)
+            print(results)
     return results
 
 
