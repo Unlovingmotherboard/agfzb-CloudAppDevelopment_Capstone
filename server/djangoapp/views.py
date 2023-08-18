@@ -72,31 +72,37 @@ def get_dealerships(request):
     if request.method == "GET":
         url = "https://us-south.functions.appdomain.cloud/api/v1/web/80ce1635-5b07-4c07-b501-faf8beb04e6c/dealership-package/get-dealership.json"
         dealerships = get_dealers_from_cf(url)
-        print(f"Back in views: {dealerships}")
-
         context["dealers"] = dealerships
-        print(context["dealers"])
 
         return render(request, "djangoapp/index.html", context)
 
 
 def get_dealer_details(request, dealer_id):
     context = {}
+    print("")
     print(f"Inside of get dealer details: {dealer_id}")
     #if request.method == "POST":
-    url = "https://us-south.functions.appdomain.cloud/api/v1/web/80ce1635-5b07-4c07-b501-faf8beb04e6c/dealership-package/get-dealership-reviews.json"
+    url = "https://us-south.functions.cloud.ibm.com/api/v1/namespaces/80ce1635-5b07-4c07-b501-faf8beb04e6c/actions/dealership-package/get-dealership-reviews"
 
     reviews = get_dealer_reviews_from_cf(url, dealer_id)
+    reviews_length = len(reviews)
 
-    context["reviews"] = reviews
-    if context["reviews"]:
-        context["response_code"] = "Success"
-    else:
-        context["response_code"] = "Fail"
+    if reviews_length > 0: 
+        context["reviews"] = reviews
+        if context["reviews"]:
+            context["response_code"] = "Success"
+        else:
+            context["response_code"] = "Fail"
+
+        return render(request, "djangoapp/dealer_details.html", context)
+
+    else: 
+        context["message"] = "Be the first to add a review!"
+        return render(request, "djangoapp/dealer_details.html", context)
 
     # add 'success' and 'error' to context. Just use the request response
-    print(context["reviews"])
-    return render(request, "djangoapp/dealer_details.html", context)
+    
+    
 
 def add_review(request, dealer_id):
     context = {}

@@ -51,23 +51,45 @@
         </nav>
 
     <!-- Add reviews as cards -->
+
+    {% if reviews|length > 0 %}
     <div class="card-columns">
         {% for review in reviews %}
         <div class="card"> 
             {% if review.sentiment == "neutral" %}
-                <img class="card-img-left" src="../static/media/emoji/neutral.png">
-                <p>Hello :)</p> {{review.sentiment}}
+                <img class="card-img-left" src="{{MEDIA_URL}}/emoji/neutral.png">
+                <div class="card-body"> 
+                    <div class="card-body">
+                        <h5 class="card-title">{{ reviews.name }}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">{{ reviews.dealership }}</h6>
+                        <p class="card-text">{{ reviews.review }}</p>
+                    </div>
+                </div>    
             {% elif review.sentiment == "positive"%}
-            <p>positive :)</p>
-                <img class="card-img-left" src="../static/media/emoji/positive.png">
-                {{review.sentiment}}
+                <img class="card-img-left" src="{{MEDIA_URL}}/emoji/positive.png">
+                <div class="card-body"> 
+                    <div class="card-body">
+                        <h5 class="card-title">{{ reviews.name }}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">{{ reviews.dealership }}</h6>
+                        <p class="card-text">{{ reviews.review }}</p>
+                    </div>
+                </div>
             {% elif review.sentiment == "negative"%}
-                <img class="card-img-left" src="../static/media/emoji/negative.png">
-                {{review.sentiment}}
-            {% endif %} 
-            
+                <img class="card-img-left" src="{{MEDIA_URL}}/emoji/negative.png">
+                <div class="card-body"> 
+                    <div class="card-body">
+                        <h5 class="card-title">{{ reviews.name }}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">{{ reviews.dealership }}</h6>
+                        <p class="card-text">{{ reviews.review }}</p>
+                    </div>
+                </div>    
+            {% endif %}    
         </div>
         {% endfor %}
+    {% else %}
+        <p>Be the first to add a review!<p>
+    {% endif %}
+
     </div>
     </body>
 

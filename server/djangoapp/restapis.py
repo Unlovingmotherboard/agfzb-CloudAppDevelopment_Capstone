@@ -2,26 +2,24 @@ import requests
 import json
 import os
 from .models import CarDealer, DealerReview
-
-# import related models here
 from requests.auth import HTTPBasicAuth
 
-
 def get_request(url, **kwargs):
-    print(kwargs)
-    print("GET from {} ".format(url))
-
+    print("")
+    print(":)")
+    print(f"kwargs: {kwargs}")
+    # print("GET from {} ".format(url))
     try:
         response = requests.get(url, headers={"Content-Type": "application/json"}, params=kwargs)
     except:
         print("Network exception occurred")
     status_code = response.status_code
-    print(f"response: {response}")
-    print("With status {} ".format(status_code))
+    # print(f"response: {response}")
+    # print("With status {} ".format(status_code))
+
     json_data = json.loads(response.text)
 
     return json_data
-
 
 def post_request(url, json_payload, **kwargs):
     try:
@@ -34,20 +32,18 @@ def post_request(url, json_payload, **kwargs):
     json_data = json.loads(response.text)
     return json_data
 
-
 def get_dealers_from_cf(url, **kwargs):
     results = []
-    # Call get_request with a URL parameter
+    
     json_result = get_request(url)
     if json_result:
-        # Get the row list in JSON as dealers
+        
         dealers = json_result["result"]["rows"]
-        # print(f"dealers: {dealers}")
-        # For each dealer object
+        
         for dealer in dealers:
-            # Get its content in `doc` object
+
             dealer_doc = dealer["doc"]
-            # Create a CarDealer object with values in `doc` object
+
             dealer_obj = CarDealer(
                 address=dealer_doc["address"],
                 city=dealer_doc["city"],
@@ -62,14 +58,26 @@ def get_dealers_from_cf(url, **kwargs):
             results.append(dealer_obj)
     return results
 
-
 def get_dealer_reviews_from_cf(url, dealer_id):
     results = []
-
+    print("")
+    print(f"Inside of restapi:-  url: {url} dealer_id:{dealer_id}")
+    
     json_result = get_request(url, dealer_id=dealer_id)
+    print("")
+    print(f"url: {url}")
+    print(f"After calling IBM Function:-  json_results: {json_result}")
+
+    if json_result["error"]: 
+        print("")
+        print("error")
+        return results
+
     if json_result:
         dealers_reviews = json_result["docs"]
-
+        dealers_reviews_print = json.dumps(dealers_reviews, indent=4)
+        print("")
+        print(f"{dealers_reviews_print}")
         for reviews in dealers_reviews:
             dealer_obj = DealerReview(
                 dealership=reviews["dealership"],
@@ -84,14 +92,7 @@ def get_dealer_reviews_from_cf(url, dealer_id):
                 id=reviews["id"],
             )
             results.append(dealer_obj)
-            print(results)
     return results
-
-
-# Create an `analyze_review_sentiments` method to call Watson NLU and analyze text
-# - Call get_request() with specified arguments
-# - Get the returned sentiment label such as Positive or Negative
-
 
 def analyze_review_sentiments(text):
     api_key = os.environ.get("NLU_API")
