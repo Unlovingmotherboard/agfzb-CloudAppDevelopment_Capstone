@@ -1,16 +1,20 @@
 import requests
 import json
 import os
-from .models import CarDealer, DealerReview
+from .models import CarDealer, DealerReview, CarModel
 from requests.auth import HTTPBasicAuth
 
 def get_request(url, **kwargs):
     print("")
     print(":)")
     print(f"kwargs: {kwargs}")
+    print(kwargs.get("dealer_id"))
     # print("GET from {} ".format(url))
+    my_params = {}
+    my_params["dealer_id"] = str(kwargs.get("dealer_id"))
+    print(my_params)
     try:
-        response = requests.get(url, headers={"Content-Type": "application/json"}, params=kwargs)
+        response = requests.get(url, headers={"Content-Type": "application/json"}, params=my_params)
     except:
         print("Network exception occurred")
     status_code = response.status_code
@@ -20,6 +24,37 @@ def get_request(url, **kwargs):
     json_data = json.loads(response.text)
 
     return json_data
+
+def form_get_dealer_details(url, dealer_id):
+    
+    json_results =  get_request(url, dealer_id=dealer_id)
+
+    result_doc = {}
+
+    dealership_cars_Django = CarModel.objects.filter(dealer_id=dealer_id)
+
+    for car_model in dealership_cars_Django:
+        print(f"")
+        print(f"idk: Car Model: {car_model.name} Year: {car_model.year}")
+        print(f"")
+        result_doc["options_cars"] = { 'name': car_model.name, 'year': car_model.year }
+
+
+
+    if json_results:
+        website_json_results = json_results["docs"]
+        print(f"json_results = {website_json_results}")
+
+        for form_info in website_json_results:
+
+            result_doc["full_name"] = form_info["full_name"]
+            result_doc["city"] = form_info["city"]
+            result_doc["lat"] = form_info["lat"]
+            result_doc["long"] = form_info["long"]
+            result_doc["state"] = form_info["state"]
+            result_doc["lat"] = form_info["lat"]
+
+        return result_doc
 
 def post_request(url, json_payload, **kwargs):
     try:
@@ -60,6 +95,7 @@ def get_dealers_from_cf(url, **kwargs):
 
 def get_dealer_reviews_from_cf(url, dealer_id):
     results = []
+    
     print("")
     print(f"Inside of restapi:-  url: {url} dealer_id:{dealer_id}")
     
@@ -67,11 +103,6 @@ def get_dealer_reviews_from_cf(url, dealer_id):
     print("")
     print(f"url: {url}")
     print(f"After calling IBM Function:-  json_results: {json_result}")
-
-    if json_result["error"]: 
-        print("")
-        print("error")
-        return results
 
     if json_result:
         dealers_reviews = json_result["docs"]
@@ -95,14 +126,14 @@ def get_dealer_reviews_from_cf(url, dealer_id):
     return results
 
 def analyze_review_sentiments(text):
-    api_key = os.environ.get("NLU_API")
+    api_key_NLU = os.environ.get("NLU_API")
     url = "https://api.us-south.natural-language-understanding.watson.cloud.ibm.com/instances/efaf0a34-acf7-4c2c-8ba4-2daa962f0571"
     params = json.dumps({"text": text, "features": {"sentiment": {}}})
     response = requests.post(
         url,
         data=params,
         headers={"Content-Type": "application/json"},
-        auth=HTTPBasicAuth("apikey", api_key),
+        auth=HTTPBasicAuth("apikey", api_key_NLU),
     )
     try:
         return response.json()["sentiment"]["document"]["label"]

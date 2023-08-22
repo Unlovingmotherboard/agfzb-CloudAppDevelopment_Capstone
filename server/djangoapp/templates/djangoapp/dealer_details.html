@@ -29,7 +29,7 @@
                 <ul class="navbar-nav">
                     {% if user.is_authenticated %}
                     <li class="nav-item">
-                        <a class="btn btn-link"> Add Review </a>
+                        <a class="btn btn-link" href="{% url 'djangoapp:add_review' dealer_id=our_dealer_id %}"> Add Review {{reviews.dealership}}</a>
                         <a class="btn btn-link" href="#">{{ user.first_name }}({{ user.username }})</a>
                         <a class="btn btn-link" href="{% url 'djangoapp:logout' %}">Logout</a>
                     </li>
@@ -60,27 +60,33 @@
                 <img class="card-img-left" src="{{MEDIA_URL}}/emoji/neutral.png">
                 <div class="card-body"> 
                     <div class="card-body">
-                        <h5 class="card-title">{{ reviews.name }}</h5>
-                        <h6 class="card-subtitle mb-2 text-muted">{{ reviews.dealership }}</h6>
-                        <p class="card-text">{{ reviews.review }}</p>
+                        <h5 class="card-title"> {{ review.name }}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">Make: {{ review.car_make }}</h6>
+                        <h6 class="card-subtitle mb-2 text-muted">Model: {{ review.car_model }}</h6>
+                        <h6 class="card-subtitle mb-2 text-muted">Year: {{ review.car_year }}</h6>
+                        <p class="card-text">"{{ review.review }}"</p>
                     </div>
                 </div>    
             {% elif review.sentiment == "positive"%}
                 <img class="card-img-left" src="{{MEDIA_URL}}/emoji/positive.png">
                 <div class="card-body"> 
                     <div class="card-body">
-                        <h5 class="card-title">{{ reviews.name }}</h5>
-                        <h6 class="card-subtitle mb-2 text-muted">{{ reviews.dealership }}</h6>
-                        <p class="card-text">{{ reviews.review }}</p>
+                        <h5 class="card-title"> {{ review.name }}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">Make: {{ review.car_make }}</h6>
+                        <h6 class="card-subtitle mb-2 text-muted">Model: {{ review.car_model }}</h6>
+                        <h6 class="card-subtitle mb-2 text-muted">Year: {{ review.car_year }}</h6>
+                        <p class="card-text">"{{ review.review }}"</p>
                     </div>
                 </div>
             {% elif review.sentiment == "negative"%}
                 <img class="card-img-left" src="{{MEDIA_URL}}/emoji/negative.png">
                 <div class="card-body"> 
                     <div class="card-body">
-                        <h5 class="card-title">{{ reviews.name }}</h5>
-                        <h6 class="card-subtitle mb-2 text-muted">{{ reviews.dealership }}</h6>
-                        <p class="card-text">{{ reviews.review }}</p>
+                        <h5 class="card-title"> {{ review.name }}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">Make: {{ review.car_make }}</h6>
+                        <h6 class="card-subtitle mb-2 text-muted">Model: {{ review.car_model }}</h6>
+                        <h6 class="card-subtitle mb-2 text-muted">Year: {{ review.car_year }}</h6>
+                        <p class="card-text">"{{ review.review }}"</p>
                     </div>
                 </div>    
             {% endif %}    

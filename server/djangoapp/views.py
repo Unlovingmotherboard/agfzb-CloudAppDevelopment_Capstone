@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, render, redirect
-from .restapis import get_dealers_from_cf, get_dealer_reviews_from_cf, post_request
+from .restapis import get_dealers_from_cf, get_dealer_reviews_from_cf, post_request, form_get_dealer_details
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 from datetime import datetime
@@ -79,21 +79,22 @@ def get_dealerships(request):
 
 def get_dealer_details(request, dealer_id):
     context = {}
+    
     print("")
     print(f"Inside of get dealer details: {dealer_id}")
     #if request.method == "POST":
-    url = "https://us-south.functions.cloud.ibm.com/api/v1/namespaces/80ce1635-5b07-4c07-b501-faf8beb04e6c/actions/dealership-package/get-dealership-reviews"
+    url = "https://us-south.functions.appdomain.cloud/api/v1/web/80ce1635-5b07-4c07-b501-faf8beb04e6c/dealership-package/get-dealership-reviews.json"
 
     reviews = get_dealer_reviews_from_cf(url, dealer_id)
     reviews_length = len(reviews)
-
+    context["our_dealer_id"] = dealer_id
     if reviews_length > 0: 
         context["reviews"] = reviews
         if context["reviews"]:
             context["response_code"] = "Success"
         else:
             context["response_code"] = "Fail"
-
+        print(context["reviews"])
         return render(request, "djangoapp/dealer_details.html", context)
 
     else: 
@@ -106,6 +107,23 @@ def get_dealer_details(request, dealer_id):
 
 def add_review(request, dealer_id):
     context = {}
+    
+    if request.method == "GET":
+        print(f"We are in the GET if statement - Now we are getting the form together - **")
+        context["dealer_id"] = dealer_id
+        url = "https://us-south.functions.appdomain.cloud/api/v1/web/80ce1635-5b07-4c07-b501-faf8beb04e6c/dealership-package/form-get-dealership.json"
+        dealership_details = form_get_dealer_details(url, dealer_id) #make API call for this dealer 
+        #get_dealership_cars = False #Get car details 
+        console_dealership_details = json.dumps(dealership_details, indent=4)
+        print("")
+        print(f"before context hits the template: {console_dealership_details}")
+        print("")
+        context["dealer"] = dealership_details
+        context["full_name"] = dealership_details["full_name"]
+        context["options_cars"] = dealership_details["options_cars"]
+
+        return render(request, "djangoapp/add_review.html", context)
+
     if request.method == "POST":
         url = "https://us-south.functions.appdomain.cloud/api/v1/web/80ce1635-5b07-4c07-b501-faf8beb04e6c/dealership-package/post-dealership-reviews"
         user = request.user
