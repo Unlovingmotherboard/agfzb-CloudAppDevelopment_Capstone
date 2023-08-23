@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, render, redirect
-from .restapis import get_dealers_from_cf, get_dealer_reviews_from_cf, post_request, form_get_dealer_details
+from .restapis import get_dealers_from_cf, get_dealer_reviews_from_cf, post_request, form_get_dealer_details, form_get_car_info
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 from datetime import datetime
@@ -115,9 +115,6 @@ def add_review(request, dealer_id):
         dealership_details = form_get_dealer_details(url, dealer_id) #make API call for this dealer 
         #get_dealership_cars = False #Get car details 
         console_dealership_details = json.dumps(dealership_details, indent=4)
-        print("")
-        print(f"before context hits the template: {console_dealership_details}")
-        print("")
         context["dealer"] = dealership_details
         context["full_name"] = dealership_details["full_name"]
         context["options_cars"] = dealership_details["options_cars"]
@@ -127,17 +124,49 @@ def add_review(request, dealer_id):
     if request.method == "POST":
         url = "https://us-south.functions.appdomain.cloud/api/v1/web/80ce1635-5b07-4c07-b501-faf8beb04e6c/dealership-package/post-dealership-reviews"
         user = request.user
+        review_data = request.POST
+        print("")
+        print(f"review_data['car']: {review_data['car']}")
+        print("")
         if user:
             review = {}
-            review["time"] = datetime.utcnow.isoformat()
+
+            car_details_from_restapi = form_get_car_info(review_data['car'])
+
+            print("")
+            print(f"car_details_from_restapi: {car_details_from_restapi}")
+            print("")
+
+            current_datetime = datetime.now()
+            formatted_datetime = current_datetime.strftime('%Y-%m-%d %H:%M:%S')
+
+            review["time"] = formatted_datetime
             review["dealership"] = dealer_id
-            review["review"] = False
+            review["review"] = review_data["form_review"]
+
+            form_purchasecheck = review_data.get("purchasecheck")
+
+            if form_purchasecheck is not None:
+                review["purchase"] = True
+            else:
+                review["purchase"] = False
+
+            print("")
+            print(f"review['purchase'] : {review['purchase']}")
+            review["purchase_date"] = review_data["purchasedate"]
+            review["car_make"] = False
+            review["car_model"] = False
+            review["car_year"] = False
+            review["name"] = str(user)
+            
 
             json_payload = {}
             json_payload["review"] = review
 
             result = post_request(url, json_payload, dealer_id=dealer_id)
-            context["review_succes"] = True
+            print("")
+            print(f"result: {result}")
+
             context["result"] = result
     return render(request, "djangoapp/index.html", context)
 

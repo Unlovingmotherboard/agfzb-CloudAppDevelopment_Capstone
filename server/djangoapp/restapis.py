@@ -1,30 +1,38 @@
 import requests
 import json
 import os
-from .models import CarDealer, DealerReview, CarModel
+from .models import CarDealer, DealerReview, CarModel, CarMake
 from requests.auth import HTTPBasicAuth
 
 def get_request(url, **kwargs):
-    print("")
-    print(":)")
-    print(f"kwargs: {kwargs}")
-    print(kwargs.get("dealer_id"))
-    # print("GET from {} ".format(url))
     my_params = {}
     my_params["dealer_id"] = str(kwargs.get("dealer_id"))
-    print(my_params)
+
     try:
         response = requests.get(url, headers={"Content-Type": "application/json"}, params=my_params)
     except:
         print("Network exception occurred")
-    status_code = response.status_code
-    # print(f"response: {response}")
-    # print("With status {} ".format(status_code))
 
     json_data = json.loads(response.text)
 
     return json_data
 
+def post_request(url, json_payload, **kwargs):
+
+    response = None
+
+    try:
+        response = requests.post(url, headers={"Content-Type": "application/json"}, json=json_payload, params=kwargs)
+        response.raise_for_status()
+    except requests.exceptions.RequestException as e:
+        print("Network exception occurred", e)
+
+    if response is not None:
+        json_data = response.json()
+        return json_data
+    else: 
+        return None
+    
 def form_get_dealer_details(url, dealer_id):
     
     json_results =  get_request(url, dealer_id=dealer_id)
@@ -33,13 +41,9 @@ def form_get_dealer_details(url, dealer_id):
 
     dealership_cars_Django = CarModel.objects.filter(dealer_id=dealer_id)
 
-    for car_model in dealership_cars_Django:
-        print(f"")
-        print(f"idk: Car Model: {car_model.name} Year: {car_model.year}")
-        print(f"")
-        result_doc["options_cars"] = { 'name': car_model.name, 'year': car_model.year }
+    form_car_options = list(dealership_cars_Django.values())
 
-
+    result_doc["options_cars"] = form_car_options
 
     if json_results:
         website_json_results = json_results["docs"]
@@ -55,18 +59,7 @@ def form_get_dealer_details(url, dealer_id):
             result_doc["lat"] = form_info["lat"]
 
         return result_doc
-
-def post_request(url, json_payload, **kwargs):
-    try:
-        response = requests.post(url, headers={"Content-Type": "application/json"}, json=json_payload, params=kwargs)
-
-    except:
-        print("Network exception occurred")
-    status_code = response.status_code
-    print("With status {} ".format(status_code))
-    json_data = json.loads(response.text)
-    return json_data
-
+  
 def get_dealers_from_cf(url, **kwargs):
     results = []
     
@@ -120,7 +113,7 @@ def get_dealer_reviews_from_cf(url, dealer_id):
                 car_make=reviews["car_make"],
                 car_model=reviews["car_model"],
                 car_year=reviews["car_year"],
-                id=reviews["id"],
+                id=reviews["_id"],
             )
             results.append(dealer_obj)
     return results
@@ -139,3 +132,32 @@ def analyze_review_sentiments(text):
         return response.json()["sentiment"]["document"]["label"]
     except KeyError:
         return "neutral"
+
+def form_get_car_info(car_id):
+    car_results = {}
+
+    car_details_from_models = CarModel.objects.filter(id=car_id)
+
+    car_details_returning = list(car_details_from_models.values())
+
+    print("")
+    print(f"inside of form_get_car_info: car_details_returning: {car_details_returning}")
+
+    id_int = int(car_details_returning["make_id"])  # COME BACK HERE 
+
+
+    get_make_from_models = CarMake.objects.get(pk=id_int)
+
+    car_make_returning = list(get_make_from_models.values())
+
+    print("")
+    print(f"inside of form_get_car_info: car_make_returning: {car_make_returning}")
+
+
+    print("")
+    print(f"get_car_make: {get_car_make}")
+
+
+    result_json = car_details_returning
+
+    return result_json
