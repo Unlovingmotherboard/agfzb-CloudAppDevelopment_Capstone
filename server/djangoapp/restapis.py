@@ -134,30 +134,13 @@ def analyze_review_sentiments(text):
         return "neutral"
 
 def form_get_car_info(car_id):
-    car_results = {}
 
-    car_details_from_models = CarModel.objects.filter(id=car_id)
+    result = {}
 
-    car_details_returning = list(car_details_from_models.values())
+    car_details_from_models = CarModel.objects.get(pk=car_id)
 
-    print("")
-    print(f"inside of form_get_car_info: car_details_returning: {car_details_returning}")
+    result["car_make"] = car_details_from_models.make.name
+    result["car_model"] = car_details_from_models.name
+    result["car_year"] = car_details_from_models.name
 
-    id_int = int(car_details_returning["make_id"])  # COME BACK HERE 
-
-
-    get_make_from_models = CarMake.objects.get(pk=id_int)
-
-    car_make_returning = list(get_make_from_models.values())
-
-    print("")
-    print(f"inside of form_get_car_info: car_make_returning: {car_make_returning}")
-
-
-    print("")
-    print(f"get_car_make: {get_car_make}")
-
-
-    result_json = car_details_returning
-
-    return result_json
+    return result

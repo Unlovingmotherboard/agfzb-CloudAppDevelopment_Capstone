@@ -109,7 +109,6 @@ def add_review(request, dealer_id):
     context = {}
     
     if request.method == "GET":
-        print(f"We are in the GET if statement - Now we are getting the form together - **")
         context["dealer_id"] = dealer_id
         url = "https://us-south.functions.appdomain.cloud/api/v1/web/80ce1635-5b07-4c07-b501-faf8beb04e6c/dealership-package/form-get-dealership.json"
         dealership_details = form_get_dealer_details(url, dealer_id) #make API call for this dealer 
@@ -125,17 +124,11 @@ def add_review(request, dealer_id):
         url = "https://us-south.functions.appdomain.cloud/api/v1/web/80ce1635-5b07-4c07-b501-faf8beb04e6c/dealership-package/post-dealership-reviews"
         user = request.user
         review_data = request.POST
-        print("")
-        print(f"review_data['car']: {review_data['car']}")
-        print("")
+       
         if user:
             review = {}
 
             car_details_from_restapi = form_get_car_info(review_data['car'])
-
-            print("")
-            print(f"car_details_from_restapi: {car_details_from_restapi}")
-            print("")
 
             current_datetime = datetime.now()
             formatted_datetime = current_datetime.strftime('%Y-%m-%d %H:%M:%S')
@@ -151,14 +144,11 @@ def add_review(request, dealer_id):
             else:
                 review["purchase"] = False
 
-            print("")
-            print(f"review['purchase'] : {review['purchase']}")
             review["purchase_date"] = review_data["purchasedate"]
-            review["car_make"] = False
-            review["car_model"] = False
-            review["car_year"] = False
+            review["car_make"] = car_details_from_restapi["car_make"]
+            review["car_model"] = car_details_from_restapi["car_model"]
+            review["car_year"] = car_details_from_restapi["car_year"]
             review["name"] = str(user)
-            
 
             json_payload = {}
             json_payload["review"] = review
